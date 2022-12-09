@@ -57,7 +57,8 @@ const putFetch = () => {
 
       if (data.hits.length === 0) {
         console.log('page', page);
-        page = 1;
+        // page = 1;
+        // totalHits = 0;
         // refs.loadingMark.classList.add('disable');
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
@@ -84,6 +85,9 @@ const handleInputForm = event => {
   event.preventDefault();
   refs.galereyList.innerHTML = '';
   fatchValue = event.target.elements.searchQuery.value;
+  page = 1;
+  totalHits = 0;
+  refs.loadingMark.classList.add('disable');
   putFetch();
   refs.inputText.value = '';
 };
