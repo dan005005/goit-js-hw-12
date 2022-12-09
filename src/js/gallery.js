@@ -1,39 +1,60 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import Notiflix from 'notiflix';
 import { fetchImages } from './fetchImages';
-// Change code below this line
 
+// refs
 const refs = {
   searchForm: document.querySelector('#search-form'),
   galereyList: document.querySelector('.gallery'),
+  loadingMark: document.querySelector('.loading'),
 };
 
+//Options
 const lightboxOptions = {
   // captionsData: 'alt',
   captionDelay: 250,
   scrollZoom: false,
 };
+const intersectionOptions = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 1.0,
+};
 
-const lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
+//Var
+let page = 1;
+let dataArr = [];
+let fatchValue = '';
+let checkLoading = false;
 
-const handleInputForm = event => {
-  event.preventDefault();
-  console.log(event.target.elements.searchQuery.value);
-  const { value } = event.target.elements.searchQuery;
-  fetchImages(value)
-    .then(dataArr => {
-      refs.galereyList.insertAdjacentHTML(
-        'beforeend',
-        renderImageCards(dataArr)
-      );
+//functions
+const putFetch = () => {
+  fetchImages(fatchValue, page)
+    .then(data => {
+      dataArr = data;
+      if ((data = [])) {
+        Notiflix.Notify.failure('Qui timide rogat docet negare');
+      }
+      console.log('data', data);
+      renderImageCards(data);
       lightbox.refresh();
-      // new SimpleLightbox('.gallery a', lightboxOptions);
     })
     .catch(error => console.log(error));
 };
 
-function renderImageCards(galleryItems) {
-  return galleryItems
+const handleInputForm = event => {
+  event.preventDefault();
+  refs.galereyList.innerHTML = '';
+  refs.loadingMark.classList.remove('disable');
+  page = 1;
+  console.log(event.target.elements.searchQuery.value);
+  fatchValue = event.target.elements.searchQuery.value;
+  putFetch();
+};
+
+const renderImageCards = galleryItems => {
+  const markup = galleryItems
     .map(
       ({
         webformatURL,
@@ -68,13 +89,23 @@ function renderImageCards(galleryItems) {
       }
     )
     .join('');
-}
+  refs.galereyList.insertAdjacentHTML('beforeend', markup);
+};
 
-function onGaleryListClick(event) {
-  event.preventDefault();
-  if (!event.target.classList.contains('gallery__image')) {
-    return;
+const hendelIntersect = event => {
+  checkLoading = event[0].isIntersecting;
+  // console.log(checkLoading);
+  if (checkLoading === true && fatchValue !== '') {
+    page += 1;
+    putFetch();
+    console.log(page);
   }
-}
+};
+
+//Classes
+const lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
+const observer = new IntersectionObserver(hendelIntersect, intersectionOptions);
+
+//Listeners
+observer.observe(refs.loadingMark);
 refs.searchForm.addEventListener('submit', handleInputForm);
-refs.galereyList.addEventListener('click', onGaleryListClick);

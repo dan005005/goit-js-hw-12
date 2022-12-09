@@ -1,16 +1,6 @@
-/* body {
-  margin: 0;
-  padding: 0;
-  background: #00a08d;
-} */
-header {
-  background-color: #579fe1;
-  height: 60px;
-  padding: 0;
-  margin: 0;
-}
 .search-form {
-  position: absolute;
+  z-index: 1001;
+  position: fixed;
   top: 20px;
   left: 50%;
 

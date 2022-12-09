@@ -1,7 +1,6 @@
 * {
   box-sizing: border-box;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
@@ -13,17 +12,19 @@ body {
   padding: 0;
   margin: 0;
 }
-
 img {
   display: block;
   max-width: 100%;
 }
 .header {
-  /* background-color: teal; */
+  z-index: 1000;
+  position: fixed;
+  background-color: #579fe1;
   height: 40px;
+  padding: 0;
   margin: 0;
+  width: 100%;
 }
-
 .section {
-  margin: 12px;
+  padding-top: 52px;
 }
