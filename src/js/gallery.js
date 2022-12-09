@@ -27,18 +27,30 @@ let page = 1;
 let dataArr = [];
 let fatchValue = '';
 let checkLoading = false;
+let totalHits = 0;
+let dataTotalHits = 0;
 
 //functions
 const putFetch = () => {
   fetchImages(fatchValue, page)
     .then(data => {
-      dataArr = data;
-      if ((data = [])) {
-        Notiflix.Notify.failure('Qui timide rogat docet negare');
-      }
-      console.log('data', data);
-      renderImageCards(data);
+      dataArr = data.hits;
+      dataTotalHits = data.totalHits;
+      console.log('data', data.totalHits);
+      renderImageCards(data.hits);
       lightbox.refresh();
+      if (data.hits.length === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else if (totalHits > data.totalHits) {
+        Notiflix.Notify.failure(
+          "We're sorry, but you've reached the end of search results."
+        );
+        return;
+      } else {
+        refs.loadingMark.classList.remove('disable');
+      }
     })
     .catch(error => console.log(error));
 };
@@ -46,8 +58,8 @@ const putFetch = () => {
 const handleInputForm = event => {
   event.preventDefault();
   refs.galereyList.innerHTML = '';
-  refs.loadingMark.classList.remove('disable');
-  page = 1;
+
+  // page += 1;
   console.log(event.target.elements.searchQuery.value);
   fatchValue = event.target.elements.searchQuery.value;
   putFetch();
@@ -94,11 +106,19 @@ const renderImageCards = galleryItems => {
 
 const hendelIntersect = event => {
   checkLoading = event[0].isIntersecting;
-  // console.log(checkLoading);
+  if (totalHits > dataTotalHits) {
+    refs.loadingMark.classList.add('disable');
+  }
+
   if (checkLoading === true && fatchValue !== '') {
-    page += 1;
-    putFetch();
+    if (page > 1) {
+      // console.log(checkLoading);
+      putFetch();
+    }
     console.log(page);
+    page += 1;
+    totalHits += 21;
+    console.log('total ', totalHits);
   }
 };
 
