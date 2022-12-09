@@ -8,6 +8,7 @@ const refs = {
   searchForm: document.querySelector('#search-form'),
   galereyList: document.querySelector('.gallery'),
   loadingMark: document.querySelector('.loading'),
+  inputText: document.querySelector('.search-txt'),
 };
 
 //Options
@@ -31,25 +32,49 @@ let totalHits = 0;
 let dataTotalHits = 0;
 
 //functions
+const hendelIntersect = event => {
+  checkLoading = event[0].isIntersecting;
+  if (totalHits > dataTotalHits) {
+    refs.loadingMark.classList.add('disable');
+  }
+
+  if (checkLoading === true && fatchValue !== '') {
+    if (page > 1) {
+      putFetch();
+    }
+    page += 1;
+    totalHits += 21;
+  }
+};
+
 const putFetch = () => {
   fetchImages(fatchValue, page)
     .then(data => {
+      // refs.loadingMark.classList.add('disable');
+      console.log(data.totalHits);
       dataArr = data.hits;
       dataTotalHits = data.totalHits;
-      console.log('data', data.totalHits);
-      renderImageCards(data.hits);
-      lightbox.refresh();
+
       if (data.hits.length === 0) {
+        console.log('page', page);
+        page = 1;
+        // refs.loadingMark.classList.add('disable');
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
-      } else if (totalHits > data.totalHits) {
-        Notiflix.Notify.failure(
-          "We're sorry, but you've reached the end of search results."
-        );
-        return;
+        // return;
       } else {
+        renderImageCards(data.hits);
+        lightbox.refresh();
         refs.loadingMark.classList.remove('disable');
+        if (totalHits > data.totalHits) {
+          Notiflix.Report.failure(
+            'Sorry',
+            "But you've reached the end of search results.",
+            'OK'
+          );
+          // return;
+        }
       }
     })
     .catch(error => console.log(error));
@@ -58,11 +83,9 @@ const putFetch = () => {
 const handleInputForm = event => {
   event.preventDefault();
   refs.galereyList.innerHTML = '';
-
-  // page += 1;
-  console.log(event.target.elements.searchQuery.value);
   fatchValue = event.target.elements.searchQuery.value;
   putFetch();
+  refs.inputText.value = '';
 };
 
 const renderImageCards = galleryItems => {
@@ -102,24 +125,6 @@ const renderImageCards = galleryItems => {
     )
     .join('');
   refs.galereyList.insertAdjacentHTML('beforeend', markup);
-};
-
-const hendelIntersect = event => {
-  checkLoading = event[0].isIntersecting;
-  if (totalHits > dataTotalHits) {
-    refs.loadingMark.classList.add('disable');
-  }
-
-  if (checkLoading === true && fatchValue !== '') {
-    if (page > 1) {
-      // console.log(checkLoading);
-      putFetch();
-    }
-    console.log(page);
-    page += 1;
-    totalHits += 21;
-    console.log('total ', totalHits);
-  }
 };
 
 //Classes
