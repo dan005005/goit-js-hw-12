@@ -72,7 +72,7 @@ const handleInputForm = event => {
     refs.galereyList.innerHTML = '';
     fatchValue = event.target.elements.searchQuery.value.trim();
     page = 1;
-    totalHits = 0;
+    totalHits = 21;
     refs.loadingMark.classList.add('disable');
     putFetch();
     refs.inputText.value = '';
@@ -131,6 +131,7 @@ const hendelIntersect = event => {
     // page += 1;
     totalHits += 21;
   }
+  console.log(totalHits);
 };
 
 //Classes
