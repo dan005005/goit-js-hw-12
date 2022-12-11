@@ -25,7 +25,7 @@ const intersectionOptions = {
 
 //Var
 let page = 0;
-let dataArr = [];
+let checkHitsLenght = 0;
 let fatchValue = '';
 let checkLoading = false;
 let totalHits = 0;
@@ -36,9 +36,9 @@ let dataTotalHits = 0;
 const putFetch = () => {
   fetchImages(fatchValue, page)
     .then(data => {
-      dataArr = data.hits;
+      checkHitsLenght += data.hits.length;
       dataTotalHits = data.totalHits;
-      if (totalHits === 21) {
+      if (checkHitsLenght > 0 && checkHitsLenght < 22) {
         Notiflix.Notify.info(`Hooray! We found ${data.totalHits} images.`);
       }
       if (data.hits.length === 0) {
@@ -49,17 +49,21 @@ const putFetch = () => {
       } else {
         renderImageCards(data.hits);
         lightbox.refresh();
-        refs.loadingMark.classList.remove('disable');
-        page += 1;
         if (totalHits > data.totalHits) {
-          Notiflix.Report.failure(
-            'Sorry',
-            "But you've reached the end of search results.",
-            'OK'
+          Notiflix.Notify.info(
+            "Sorry, but you've reached the end of search results."
           );
-          return;
         }
       }
+      refs.loadingMark.classList.remove('disable');
+      if (totalHits > dataTotalHits) {
+        refs.loadingMark.classList.add('disable');
+        checkHitsLenght = 0;
+        page = 1;
+        totalHits = 21;
+      }
+      page += 1;
+      totalHits += 21;
     })
     .catch(error => console.log(error));
 };
@@ -71,6 +75,7 @@ const handleInputForm = event => {
   } else {
     refs.galereyList.innerHTML = '';
     fatchValue = event.target.elements.searchQuery.value.trim();
+    checkHitsLenght = 0;
     page = 1;
     totalHits = 21;
     refs.loadingMark.classList.add('disable');
@@ -120,18 +125,11 @@ const renderImageCards = galleryItems => {
 
 const hendelIntersect = event => {
   checkLoading = event[0].isIntersecting;
-  if (totalHits > dataTotalHits) {
-    refs.loadingMark.classList.add('disable');
-  }
   if (checkLoading === true && fatchValue !== '') {
     if (page > 1) {
       putFetch();
-      // page += 1;
     }
-    // page += 1;
-    totalHits += 21;
   }
-  console.log(totalHits);
 };
 
 //Classes
