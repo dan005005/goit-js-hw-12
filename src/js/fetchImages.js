@@ -1,9 +1,49 @@
 import axios from 'axios';
 
-export const fetchImages = async (value, page) => {
-  const respons = await axios.get(
-    `https://pixabay.com/api/?key=31800059-86399197816311d7a5cbd5e2b&q=${value}&image_type=photo&pretty=true&orientation=horizontal&page=${page}&per_page=21`
-  );
-  //const respValue = await respons;
-  return respValue.data;
-};
+const URL = 'https://pixabay.com/api/';
+const API_KEY = '31959866-848f36ee956c46b4ab479fa6b';
+const searchParams = new URLSearchParams({
+  image_type: 'photo',
+  orientation: 'horizontal',
+  safesearch: 'true',
+  per_page: '40',
+});
+
+export default class PixabayApi {
+  constructor() {
+    this.searchQuery = '';
+    this.page = 1;
+  }
+
+  // fetchImages() {
+  //   return fetch(
+  //     `${URL}?key=${API_KEY}&q=${this.searchQuery}&${searchParams}&page=${this.page}`
+  //   ).then(response => {
+  //     return response.json();
+  //   });
+  // }
+  async fetchImages() {
+    try {
+      const { data } = await axios.get(
+        `${URL}?key=${API_KEY}&q=${this.searchQuery}&${searchParams}&page=${this.page}`
+      );
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  incrementPage() {
+    this.page += 1;
+  }
+  resetPage() {
+    this.page = 1;
+  }
+  get query() {
+    return this.searchQuery;
+  }
+  set query(newQuery) {
+    this.searchQuery = newQuery;
+  }
+}
